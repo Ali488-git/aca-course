@@ -1,16 +1,17 @@
 name: Build and deploy a container to an Azure Container Apps - ACA
 
 env:
-  IMAGE_NAME: houssemdellai/containerapps-album-api
+  # Push to *this repo owner’s* GHCR namespace (fixes permission_denied)
+  IMAGE_NAME: ${{ github.repository_owner }}/containerapps-album-api
   CONTAINERAPPS_APP: album-backend-api
   CONTAINERAPPS_ENVIRONMENT: aca-environment
   RESOURCE_GROUP: rg-containerapps-github-actions
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
-      - '.github/workflows/**'
+      - ".github/workflows/**"
   workflow_dispatch:
 
 permissions:
@@ -49,18 +50,17 @@ jobs:
     needs: build-push-container-image
 
     steps:
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Build and deploy Container App
-      uses: azure/container-apps-deploy-action@v1
-      with:
-        registryUrl: ghcr.io
-        imageToDeploy: ghcr.io/${{ env.IMAGE_NAME }}:${{ github.run_number }}
-        targetPort: 3500
-        ingress: external
-        containerAppName: ${{ env.CONTAINERAPPS_APP }}
-        containerAppEnvironment: ${{ env.CONTAINERAPPS_ENVIRONMENT }}
-        resourceGroup: ${{ env.RESOURCE_GROUP }}
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          registryUrl: ghcr.io
+          imageToDeploy: ghcr.io/${{ env.IMAGE_NAME }}:${{ github.run_number }}
+          targetPort: 3500
+          ingress: external
+          containerAppName: ${{ env.CONTAINERAPPS_APP }}
+          containerAppEnvironment: ${{ env.CONTAINERAPPS_ENVIRONMENT }}
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
