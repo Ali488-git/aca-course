@@ -2,7 +2,8 @@ name: Build and deploy a container to an Azure Container Apps - ACA
 
 env:
   # Push to *this repo owner’s* GHCR namespace (fixes permission_denied)
-  IMAGE_NAME: ${{ github.repository_owner }}/containerapps-album-api
+  # NOTE: GHCR/Docker image names must be lowercase
+  IMAGE_NAME: ali488-git/containerapps-album-api
   CONTAINERAPPS_APP: album-backend-api
   CONTAINERAPPS_ENVIRONMENT: aca-environment
   RESOURCE_GROUP: rg-containerapps-github-actions
